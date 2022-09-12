@@ -1,0 +1,329 @@
+name: GitHub New CI
+
+on:
+-   push
+-   pull_request
+
+jobs:
+    windowsBuild:
+        name: Windows Build
+        runs-on: windows-2019
+
+        strategy:
+            fail-fast: false
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+                TARGET_CPU:
+                -   x86
+                -   amd64
+
+        env:
+            RELEASE: ${{ startsWith(github.ref, 'refs/tags/') && matrix.CONFIGURATION == 'Release' }}
+
+        defaults:
+            run:
+                shell: cmd
+
+        steps:
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Install
+            run: |
+                set CONFIGURATION=${{matrix.CONFIGURATION}}
+                set LLVM_VERSION=${{matrix.LLVM_VERSION}}
+                call ci\github-actions\set-env.bat msvc16 ${{matrix.TARGET_CPU}}
+                call ci\github-actions\install-windows.bat
+                git clone --depth 1 https://github.com/vovkos/axl
+
+        -   name: Build and test
+            run: |
+                set CONFIGURATION=${{matrix.CONFIGURATION}}
+                set LLVM_VERSION=${{matrix.LLVM_VERSION}}
+                set DOWNLOAD_DIR=%CD:~0,2%\downloads
+                set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
+                set THIS_DIR=%CD%
+                set THIS_DIR_CMAKE=%THIS_DIR:\=/%
+
+                call ci\github-actions\set-env.bat msvc16 ${{matrix.TARGET_CPU}}
+
+                mkdir %DOWNLOAD_DIR%\expat\build
+                cd %DOWNLOAD_DIR%\expat\build
+                cmake .. %CMAKE_CONFIGURE_FLAGS% %EXPAT_CMAKE_FLAGS% || exit
+                cmake --build . %CMAKE_BUILD_FLAGS% || exit
+                
+                cd %THIS_DIR%
+                echo set (EXPAT_INC_DIR %DOWNLOAD_DIR_CMAKE%/expat/lib) >> paths.cmake
+                echo set (EXPAT_LIB_DIR %DOWNLOAD_DIR_CMAKE%/expat/build/%CONFIGURATION%) >> paths.cmake
+
+                mkdir axl\build
+                cd axl\build
+                cmake .. %CMAKE_CONFIGURE_FLAGS% || exit
+                cmake --build . %CMAKE_BUILD_FLAGS% || exit
+
+                cd %THIS_DIR%
+                echo set (AXL_CMAKE_DIR %THIS_DIR_CMAKE%/axl/cmake %THIS_DIR_CMAKE%/axl/build/cmake) >> paths.cmake
+
+                mkdir build
+                cd build
+                cmake .. %CMAKE_CONFIGURE_FLAGS% || exit
+                cmake --build . %CMAKE_BUILD_FLAGS% || exit
+                ctest --output-on-failure -C %CONFIGURATION% || exit
+
+        -   name: Package
+            id: PACKAGE
+            if: ${{ env.RELEASE == 'true' }}
+            run: |
+                set THIS_DIR=%CD%
+                set THIS_DIR_CMAKE=%THIS_DIR:\=/%
+
+                cd build
+                cpack -G 7Z -C Release
+
+                for /f "usebackq tokens=*" %%i in (`cmake -P print-package-file-name.cmake 2^>^&1`) do (set CPACK_PACKAGE_FILE_NAME=%%i)
+                set DEPLOY_FILE=build/%CPACK_PACKAGE_FILE_NAME%.7z
+
+                echo ::set-output name=DEPLOY_FILE::%DEPLOY_FILE%
+
+        -   name: Deploy to GitHub Releases
+            uses: softprops/action-gh-release@v1
+            if: ${{ env.RELEASE == 'true' }}
+            env:
+                GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            with:
+                files: ${{steps.PACKAGE.outputs.DEPLOY_FILE}}
+
+    linuxBuild:
+        name: Linux Build
+        runs-on: ubuntu-18.04
+
+        strategy:
+            fail-fast: false
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+                TARGET_CPU:
+                -   x86
+                -   amd64
+
+                COMPILER:
+                -   gcc
+                -   clang
+
+        env:
+            RELEASE: ${{ startsWith(github.ref, 'refs/tags/') && matrix.CONFIGURATION == 'Release' && matrix.COMPILER == 'gcc' }}
+            BUILD_DOC: ${{ github.ref == 'refs/heads/master' && matrix.CONFIGURATION == 'Release' && matrix.TARGET_CPU == 'amd64' && matrix.COMPILER == 'gcc' }}
+
+        defaults:
+            run:
+                shell: bash
+
+        steps:
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Install
+            run: |
+                export TARGET_CPU=${{matrix.TARGET_CPU}}
+                source ./ci/github-actions/install-linux.sh
+                git clone --depth 1 https://github.com/vovkos/axl
+
+        -   name: Install documentation tools
+            if: ${{ env.BUILD_DOC == 'true' }}
+            run: |
+                git clone --depth 1 https://github.com/vovkos/graco
+                git clone --depth 1 https://github.com/vovkos/luadoxyxml
+
+        -   name: Build and test
+            run: |
+                THIS_DIR=$(pwd)
+                export CC=$(which ${{matrix.COMPILER}})
+                export CXX=$(which ${{matrix.COMPILER}}++)
+
+                mkdir axl/build
+                pushd axl/build
+                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                popd
+
+                echo "set (AXL_CMAKE_DIR $THIS_DIR/axl/cmake $THIS_DIR/axl/build/cmake)" >> paths.cmake
+
+                mkdir build
+                pushd build
+                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                ctest --output-on-failure
+                popd
+
+        -   name: Build documentation tools
+            if: ${{ env.BUILD_DOC == 'true' }}
+            run: |
+                THIS_DIR=$(pwd)
+
+                mkdir graco/build
+                pushd graco/build
+                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                popd
+
+                echo "set(GRACO_CMAKE_DIR $THIS_DIR/graco/cmake $THIS_DIR/graco/build/cmake)" >> paths.cmake
+
+                mkdir luadoxyxml/build
+                pushd luadoxyxml/build
+                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                popd
+
+                echo "set(LUADOXYXML_EXE $THIS_DIR/luadoxyxml/build/bin/${{matrix.CONFIGURATION}}/luadoxyxml)" >> paths.cmake
+
+                pushd build
+                cmake .
+                popd
+
+        -   name: Build documentation
+            if: ${{ env.BUILD_DOC == 'true' }}
+            run: |
+                pushd build
+                source doc/index/build-html.sh
+                source doc/build-guide/build-html.sh
+                source doc/manual/build-xml.sh
+                source doc/manual/build-rst.sh
+                source doc/manual/build-html.sh
+
+                source samples/libusb/build-rst.sh
+                source samples/libusb/build-html.sh -D html_theme=sphinxdoc
+                mv doc/html/samples/{libusb,libusb-sphinxdoc}
+                source samples/libusb/build-html.sh
+
+                source samples/libssh/build-rst.sh
+                source samples/libssh/build-html.sh -D html_theme=sphinxdoc
+                mv doc/html/samples/{libssh,libssh-sphinxdoc}
+                source samples/libssh/build-html.sh
+
+                source samples/alsa/build-rst.sh
+                source samples/alsa/build-html.sh -D html_theme=sphinxdoc
+                mv doc/html/samples/{alsa,alsa-sphinxdoc}
+                source samples/alsa/build-html.sh
+
+                source samples/apr/build-rst.sh
+                source samples/apr/build-html.sh -D html_theme=sphinxdoc
+                mv doc/html/samples/{apr,apr-sphinxdoc}
+                source samples/apr/build-html.sh
+
+                touch doc/html/.nojekyll
+                popd
+
+        -   name: Package
+            id: PACKAGE
+            if: ${{ env.RELEASE == 'true' }}
+            run: |
+                set THIS_DIR=%CD%
+                set THIS_DIR_CMAKE=%THIS_DIR:\=/%
+
+                cd build
+                cpack -G TXZ
+
+                CPACK_PACKAGE_FILE_NAME=$(cmake -P print-package-file-name.cmake 2>&1)
+                DEPLOY_FILE=build/$CPACK_PACKAGE_FILE_NAME.tar.xz
+
+                cmake -P print-package-file-name.cmake
+                echo CPACK_PACKAGE_FILE_NAME: $CPACK_PACKAGE_FILE_NAME
+                echo DEPLOY_FILE: $DEPLOY_FILE
+
+                echo ::set-output name=DEPLOY_FILE::$DEPLOY_FILE
+
+        -   name: Deploy to GitHub Releases
+            if: ${{ env.RELEASE == 'true' }}
+            uses: softprops/action-gh-release@v1
+            env:
+                GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            with:
+                files: ${{steps.PACKAGE.outputs.DEPLOY_FILE}}
+
+        -   name: Deploy to GitHub Pages
+            if: ${{ env.BUILD_DOC == 'true' }}
+            uses: peaceiris/actions-gh-pages@v3
+            with:
+                github_token: ${{secrets.GITHUB_TOKEN}}
+                publish_dir: build/doc/html
+                force_orphan: true
+
+    macOsBuild:
+        name: macOS Build
+        runs-on: macos-10.15
+
+        strategy:
+            fail-fast: false
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+        env:
+            RELEASE: ${{ startsWith(github.ref, 'refs/tags/') && matrix.CONFIGURATION == 'Release' }}
+
+        defaults:
+            run:
+                shell: bash
+
+        steps:
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Install
+            run: |
+                pwd
+                source ./ci/github-actions/install-osx.sh
+                git clone --depth 1 https://github.com/vovkos/axl
+
+        -   name: Build and test
+            run: |
+                THIS_DIR=$(pwd)
+
+                mkdir axl/build
+                pushd axl/build
+                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                popd
+
+                echo "set (AXL_CMAKE_DIR $THIS_DIR/axl/cmake $THIS_DIR/axl/build/cmake)" >> paths.cmake
+
+                mkdir build
+                pushd build
+                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+                make
+                ctest --output-on-failure
+                popd
+
+        -   name: Package
+            id: PACKAGE
+            if: ${{ env.RELEASE == 'true' }}
+            run: |
+                set THIS_DIR=%CD%
+                set THIS_DIR_CMAKE=%THIS_DIR:\=/%
+
+                cd build
+                cpack -G TXZ
+
+                CPACK_PACKAGE_FILE_NAME=$(cmake -P print-package-file-name.cmake 2>&1)
+                DEPLOY_FILE=build/$CPACK_PACKAGE_FILE_NAME.tar.xz
+
+                cmake -P print-package-file-name.cmake
+                echo CPACK_PACKAGE_FILE_NAME: $CPACK_PACKAGE_FILE_NAME
+                echo DEPLOY_FILE: $DEPLOY_FILE
+
+                echo ::set-output name=DEPLOY_FILE::$DEPLOY_FILE
+
+        -   name: Deploy to GitHub Releases
+            if: ${{ env.RELEASE == 'true' }}
+            uses: softprops/action-gh-release@v1
+            env:
+                GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            with:
+                files: ${{steps.PACKAGE.outputs.DEPLOY_FILE}}
+
