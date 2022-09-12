@@ -12,12 +12,12 @@
 if [[ $TARGET_CPU != "x86" ]]; then
 	sudo apt-get -qq update
 
-	sudo apt-get install -y liblua5.2-dev
+	sudo apt-get install -y liblua5.3-dev
 else
 	sudo dpkg --add-architecture i386
 	sudo apt-get -qq update
 
-	sudo apt-get install -y liblua5.2-dev:i386
+	sudo apt-get install -y liblua5.3-dev:i386
 
 	# Expat is already installed, but 64-bit only
 
