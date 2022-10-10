@@ -134,6 +134,7 @@ DocBlock::luaExportMembers(lua::LuaState* luaState) {
 	luaState->setMemberString("blockKind", m_blockKind);
 	luaState->setMemberString("title", m_title);
 	luaState->setMemberString("text", m_text);
+	luaState->setMemberString("blockClass", m_blockClass);
 
 	luaExportList(luaState, m_childBlockList);
 	luaState->setMember("childBlockList");
