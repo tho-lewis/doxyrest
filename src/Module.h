@@ -62,6 +62,7 @@ struct DocBlock: sl::ListLink {
 	sl::String m_blockKind;
 	sl::String m_title;
 	sl::String m_text;
+	sl::String m_blockClass;
 	sl::List<DocBlock> m_childBlockList;
 
 	virtual ~DocBlock() {}
