@@ -1156,7 +1156,7 @@ DocParaType::onStartElement(
 	}
 	
 	fprintf(
-		stderr,
+		stdout,
 		"para name: %s \n",
 		name
 	);
@@ -1164,17 +1164,17 @@ DocParaType::onStartElement(
 	if(strcmp(name, "entry") == 0)
 	{
 		fprintf(
-			stderr,
+			stdout,
 			"warning: entry attribute 0: %s \n",
 			attributes[0]
 		);
 		fprintf(
-			stderr,
+			stdout,
 			"warning: entry attribute 1: %s \n",
 			attributes[1]
 		);
 		fprintf(
-			stderr,
+			stdout,
 			"warning: entry attribute 2: %s \n",
 			attributes[2]
 		);
