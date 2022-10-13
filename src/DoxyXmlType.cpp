@@ -1157,7 +1157,7 @@ DocParaType::onStartElement(
 	
 	fprintf(
 		stderr,
-		"%s: para name: %s \n",
+		"para name: %s \n",
 		name
 	);
 	
@@ -1165,17 +1165,17 @@ DocParaType::onStartElement(
 	{
 		fprintf(
 			stderr,
-			"%s: warning: entry attribute 0: %s \n",
+			"warning: entry attribute 0: %s \n",
 			attributes[0]
 		);
 		fprintf(
 			stderr,
-			"%s: warning: entry attribute 1: %s \n",
+			"warning: entry attribute 1: %s \n",
 			attributes[1]
 		);
 		fprintf(
 			stderr,
-			"%s: warning: entry attribute 2: %s \n",
+			"warning: entry attribute 2: %s \n",
 			attributes[2]
 		);
 		printf(attributes[0]);
