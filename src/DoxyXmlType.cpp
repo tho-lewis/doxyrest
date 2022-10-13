@@ -1158,10 +1158,11 @@ DocParaType::onStartElement(
 	if(strcmp(name, "entry") == 0)
 	{
 		while (*attributes) {
-			printf(attributes[0]);
-			printf(attributes[1]);
-			if(strcmp(attributes[0], "class"))
+			
+			if(strcmp(attributes[0], "class") == 0)
 			{
+				printf(attributes[0]);
+				printf(attributes[1]);
 				m_paragraphBlock->m_blockClass = attributes[1];
 			}
 			attributes += 2;
