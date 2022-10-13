@@ -1158,10 +1158,9 @@ DocParaType::onStartElement(
 	if(strcmp(name, "entry") == 0)
 	{
 		while (*attributes) {
-			AttrKind attrKind = AttrKindMap::findValue(attributes[0], AttrKind_Undefined);
 			if(strcmp(attributes[0], "class"))
 			{
-				m_paragraphBlock->m_blockClass = attributes[1]
+				m_paragraphBlock->m_blockClass = attributes[1];
 			}
 			attributes += 2;
 		}
