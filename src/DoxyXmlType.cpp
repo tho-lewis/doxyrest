@@ -1155,32 +1155,16 @@ DocParaType::onStartElement(
 		m_parser->pushType<DocParaType>(&m_paragraphBlock->m_childBlockList, name, attributes);
 	}
 	
-	fprintf(
-		stdout,
-		"para name: %s \n",
-		name
-	);
-	
 	if(strcmp(name, "entry") == 0)
 	{
-		fprintf(
-			stdout,
-			"warning: entry attribute 0: %s \n",
-			attributes[0]
-		);
-		fprintf(
-			stdout,
-			"warning: entry attribute 1: %s \n",
-			attributes[1]
-		);
-		fprintf(
-			stdout,
-			"warning: entry attribute 2: %s \n",
-			attributes[2]
-		);
-		printf(attributes[0]);
-		printf(attributes[1]);
-		printf(attributes[2]);
+		while (*attributes) {
+			AttrKind attrKind = AttrKindMap::findValue(attributes[0], AttrKind_Undefined);
+			if(strcmp(attributes[0], "class"))
+			{
+				m_paragraphBlock->m_blockClass = attributes[1]
+			}
+			attributes += 2;
+		}
 	}
 
 	m_textBlock = AXL_MEM_NEW(DocBlock);
