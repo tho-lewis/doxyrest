@@ -1155,8 +1155,29 @@ DocParaType::onStartElement(
 		m_parser->pushType<DocParaType>(&m_paragraphBlock->m_childBlockList, name, attributes);
 	}
 	
+	fprintf(
+		stderr,
+		"%s: para name: %s \n",
+		name
+	);
+	
 	if(name == "entry")
 	{
+		fprintf(
+			stderr,
+			"%s: warning: entry attribute 0: %s \n",
+			attributes[0]
+		);
+		fprintf(
+			stderr,
+			"%s: warning: entry attribute 1: %s \n",
+			attributes[1]
+		);
+		fprintf(
+			stderr,
+			"%s: warning: entry attribute 2: %s \n",
+			attributes[2]
+		);
 		printf(attributes[0]);
 		printf(attributes[1]);
 		printf(attributes[2]);
