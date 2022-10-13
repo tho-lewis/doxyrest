@@ -1161,7 +1161,7 @@ DocParaType::onStartElement(
 		name
 	);
 	
-	if(name == "entry")
+	if(strcmp(name, "entry") == 0)
 	{
 		fprintf(
 			stderr,
