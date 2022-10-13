@@ -1154,6 +1154,13 @@ DocParaType::onStartElement(
 	default:
 		m_parser->pushType<DocParaType>(&m_paragraphBlock->m_childBlockList, name, attributes);
 	}
+	
+	if(name == "entry")
+	{
+		printf(attributes[0]);
+		printf(attributes[1]);
+		printf(attributes[2]);
+	}
 
 	m_textBlock = AXL_MEM_NEW(DocBlock);
 	m_paragraphBlock->m_childBlockList.insertTail(m_textBlock);
