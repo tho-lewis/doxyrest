@@ -1124,8 +1124,6 @@ DocParaType::create(
 			}
 			attributes += 2;
 		}
-		printf("After attribute selection for para!!");
-		printf(m_paragraphBlock->m_blockClass);
 	}
 	
 	
