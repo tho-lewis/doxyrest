@@ -1119,13 +1119,15 @@ DocParaType::create(
 			
 			if(strcmp(attributes[0], "class") == 0)
 			{
-				printf(attributes[0]);
-				printf(attributes[1]);
 				m_paragraphBlock->m_blockClass = attributes[1];
+				break;
 			}
 			attributes += 2;
 		}
+		printf("After attribute selection for para!!");
+		printf(m_paragraphBlock->m_blockClass);
 	}
+	
 	
 	blockList->insertTail(m_paragraphBlock);
 
