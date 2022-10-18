@@ -1122,6 +1122,11 @@ DocParaType::create(
 				m_paragraphBlock->m_blockClass = attributes[1];
 				break;
 			}
+			else if(strcmp(attributes[0], "thead") == 0)
+			{
+				m_paragraphBlock->m_thead = attributes[1];
+				break;
+			}
 			attributes += 2;
 		}
 	}
