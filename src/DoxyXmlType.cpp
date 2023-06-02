@@ -1112,6 +1112,26 @@ DocParaType::create(
 	m_parser = parser;
 	m_paragraphBlock = AXL_MEM_NEW(DocBlock);
 	m_paragraphBlock->m_blockKind = name;
+	
+	if(strcmp(name, "entry") == 0)
+	{
+		while (*attributes) {
+			
+			if(strcmp(attributes[0], "class") == 0)
+			{
+				m_paragraphBlock->m_blockClass = attributes[1];
+				//break;
+			}
+			else if(strcmp(attributes[0], "thead") == 0)
+			{
+				m_paragraphBlock->m_thead = attributes[1];
+				//break;
+			}
+			attributes += 2;
+		}
+	}
+	
+	
 	blockList->insertTail(m_paragraphBlock);
 
 	m_textBlock = AXL_MEM_NEW(DocBlock);
@@ -1153,34 +1173,6 @@ DocParaType::onStartElement(
 
 	default:
 		m_parser->pushType<DocParaType>(&m_paragraphBlock->m_childBlockList, name, attributes);
-	}
-	
-	fprintf(
-		stderr,
-		"para name: %s \n",
-		name
-	);
-	
-	if(strcmp(name, "entry") == 0)
-	{
-		fprintf(
-			stderr,
-			"warning: entry attribute 0: %s \n",
-			attributes[0]
-		);
-		fprintf(
-			stderr,
-			"warning: entry attribute 1: %s \n",
-			attributes[1]
-		);
-		fprintf(
-			stderr,
-			"warning: entry attribute 2: %s \n",
-			attributes[2]
-		);
-		printf(attributes[0]);
-		printf(attributes[1]);
-		printf(attributes[2]);
 	}
 
 	m_textBlock = AXL_MEM_NEW(DocBlock);
