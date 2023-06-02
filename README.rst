@@ -20,6 +20,7 @@ Doxyrest
 .. image:: https://img.shields.io/badge/donate-@jancy.org-blue.svg
 	:align: right
 	:target: http://jancy.org/donate.html?donate=doxyrest
+	
 
 Abstract
 --------
