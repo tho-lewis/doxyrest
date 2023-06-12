@@ -1201,6 +1201,7 @@ public:
 class DocUlinkType: public DoxyXmlType {
 protected:
 	enum ElemKind {
+		ElemKind_Undefined,
 		ElemKind_ComputerOutput,
 
 		// ...add as needed
@@ -1222,6 +1223,7 @@ protected:
 
 protected:
 	DocUlinkBlock* m_ulinkBlock;
+	DocBlock* m_textBlock;
 
 public:
 	DocUlinkType() {
