@@ -1326,6 +1326,26 @@ DocUlinkType::create(
 	return true;
 }
 
+bool
+DocUlinkType::onStartElement(
+	const char* name,
+	const char** attributes
+) {
+	ElemKind elemKind = ElemKindMap::findValue(name, ElemKind_Undefined);
+	switch (elemKind) {
+	case ElemKind_ComputerOutput:
+		m_parser->pushType<DocParaType>(&m_ulinkBlock->m_childBlockList, name, attributes);
+		break;
+
+	default:
+		m_parser->pushType<DocParaType>(&m_ulinkBlock->m_childBlockList, name, attributes);
+	}
+
+	m_textBlock = AXL_MEM_NEW(DocBlock);
+	m_ulinkBlock->m_childBlockList.insertTail(m_textBlock);
+	return true;
+}
+
 //..............................................................................
 
 bool
