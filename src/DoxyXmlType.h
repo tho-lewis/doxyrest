@@ -1200,6 +1200,17 @@ public:
 
 class DocUlinkType: public DoxyXmlType {
 protected:
+	enum ElemKind {
+		ElemKind_ComputerOutput,
+
+		// ...add as needed
+	};
+
+	AXL_SL_BEGIN_STRING_HASH_TABLE(ElemKindMap, ElemKind)
+		AXL_SL_HASH_TABLE_ENTRY("computeroutput",        ElemKind_ComputerOutput)
+	AXL_SL_END_HASH_TABLE()
+
+protected:
 	enum AttrKind {
 		AttrKind_Undefined,
 		AttrKind_Url,
@@ -1221,6 +1232,13 @@ public:
 	create(
 		DoxyXmlParser* parser,
 		sl::List<DocBlock>* list,
+		const char* name,
+		const char** attributes
+	);
+	
+	virtual
+	bool
+	onStartElement(
 		const char* name,
 		const char** attributes
 	);
