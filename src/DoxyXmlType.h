@@ -1262,12 +1262,12 @@ class DocProgramListingType: public DoxyXmlType {
 protected:
 	enum ElemKind {
 		ElemKind_Undefined,
-		ElemKind_Codeline
+		ElemKind_Blankblank,
 		// ...add as needed
 	};
 	
 	AXL_SL_BEGIN_STRING_HASH_TABLE(ElemKindMap, ElemKind)
-		AXL_SL_HASH_TABLE_ENTRY("codeline",        ElemKind_Codeline)
+		AXL_SL_HASH_TABLE_ENTRY("blankblank",        ElemKind_Blankblank)
 	AXL_SL_END_HASH_TABLE()
 	
 	enum AttrKind {
