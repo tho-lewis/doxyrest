@@ -212,6 +212,15 @@ DocUlinkBlock::luaExport(lua::LuaState* luaState) {
 	luaState->setMemberString("url", m_url);
 }
 
+void
+DocProgramListingBlock::luaExport(lua::LuaState* luaState) {
+	luaState->createTable();
+
+	DocBlock::luaExportMembers(luaState);
+
+	luaState->setMemberString("filename", m_filename);
+}
+
 //.............................................................................
 
 void
