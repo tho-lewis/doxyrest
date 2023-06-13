@@ -1299,6 +1299,34 @@ DocImageType::create(
 //..............................................................................
 
 bool
+DocProgramListingType::create(
+		DoxyXmlParser* parser,
+		sl::List<DocBlock>* list,
+		const char* name,
+		const char** attributes
+	) {
+	m_parser = parser;
+	m_programlistingBlock = AXL_MEM_NEW(DocProgramListingBlock);
+	m_programlistingBlock->m_blockKind = name;
+	list->insertTail(m_programlistingBlock);
+
+	while (*attributes) {
+		AttrKind attrKind = AttrKindMap::findValue(attributes[0], AttrKind_Undefined);
+		switch (attrKind) {
+			case AttrKind_Filename:
+				m_programlistingBlock->m_filename = attributes[1];
+				break;
+
+			// add as needed
+		}
+
+		attributes += 2;
+	}
+
+	return true;
+}
+
+bool
 DocUlinkType::create(
 		DoxyXmlParser* parser,
 		sl::List<DocBlock>* list,
