@@ -1260,6 +1260,11 @@ public:
 
 class DocProgramListingType: public DoxyXmlType {
 protected:
+	enum ElemKind {
+		ElemKind_Undefined,
+		// ...add as needed
+	};
+	
 	enum AttrKind {
 		AttrKind_Undefined,
 		AttrKind_Filename,
@@ -1276,6 +1281,7 @@ protected:
 public:
 	DocProgramListingType() {
 		m_programlistingBlock = NULL;
+		m_textBlock = NULL;
 	}
 
 	bool
@@ -1285,6 +1291,14 @@ public:
 		const char* name,
 		const char** attributes
 	);
+	
+	virtual
+	bool
+	onStartElement(
+		const char* name,
+		const char** attributes
+	);
+
 
 	virtual
 	bool
