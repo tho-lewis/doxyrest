@@ -1017,6 +1017,7 @@ protected:
 		ElemKind_SimpleSect,
 		ElemKind_Ulink,
 		ElemKind_Heading,
+		ElemKind_ProgramListing,
 
 		// ...add as needed
 	};
@@ -1028,6 +1029,7 @@ protected:
 		AXL_SL_HASH_TABLE_ENTRY("simplesect", ElemKind_SimpleSect)
 		AXL_SL_HASH_TABLE_ENTRY("ulink",      ElemKind_Ulink)
 		AXL_SL_HASH_TABLE_ENTRY("heading",    ElemKind_Heading)
+		AXL_SL_HASH_TABLE_ENTRY("programlisting",    ElemKind_ProgramListing)
 	AXL_SL_END_HASH_TABLE()
 
 protected:
