@@ -1268,7 +1268,7 @@ protected:
 	AXL_SL_END_HASH_TABLE()
 
 protected:
-	DocProgramListingType* m_programlistingBlock;
+	DocProgramListingBlock* m_programlistingBlock;
 	DocBlock* m_textBlock;
 
 public:
