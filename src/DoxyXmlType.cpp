@@ -312,8 +312,6 @@ CompoundDefType::onStartElement(
 	case ElemKind_InheritanceGraph:
 	case ElemKind_CollaborationGraph:
 	case ElemKind_ProgramListing:
-		m_parser->pushType<DocProgramListingType>(&m_compound->m_detailedDescription, name, attributes);
-		break;
 	case ElemKind_ListOfAllMembers:
 		break;
 	}
@@ -1171,6 +1169,9 @@ DocParaType::onStartElement(
 
 	case ElemKind_SimpleSect:
 		m_parser->pushType<DocSimpleSectionType>(&m_paragraphBlock->m_childBlockList, name, attributes);
+		break;
+	case ElemKind_ProgramListing:
+		m_parser->pushType<DocProgramListingType>(&m_paragraphBlock->m_childBlockList, name, attributes);
 		break;
 
 	default:
