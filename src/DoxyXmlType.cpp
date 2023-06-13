@@ -1330,6 +1330,22 @@ DocProgramListingType::create(
 }
 
 bool
+DocProgramListingType::onStartElement(
+	const char* name,
+	const char** attributes
+) {
+	ElemKind elemKind = ElemKindMap::findValue(name, ElemKind_Undefined);
+	switch (elemKind) {
+	default:
+		m_parser->pushType<DocParaType>(&m_programlistingBlock->m_childBlockList, name, attributes);
+	}
+
+	m_textBlock = AXL_MEM_NEW(DocBlock);
+	m_programlistingBlock->m_childBlockList.insertTail(m_textBlock);
+	return true;
+}
+
+bool
 DocUlinkType::create(
 		DoxyXmlParser* parser,
 		sl::List<DocBlock>* list,
