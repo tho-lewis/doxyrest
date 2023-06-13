@@ -1256,6 +1256,46 @@ public:
 	}
 };
 
+class DocProgramListingType: public DoxyXmlType {
+protected:
+	enum AttrKind {
+		AttrKind_Undefined,
+		AttrKind_Filename,
+	};
+
+	AXL_SL_BEGIN_STRING_HASH_TABLE(AttrKindMap, AttrKind)
+		AXL_SL_HASH_TABLE_ENTRY("filename", AttrKind_Filename)
+	AXL_SL_END_HASH_TABLE()
+
+protected:
+	DocProgramListingType* m_programlistingBlock;
+	DocBlock* m_textBlock;
+
+public:
+	DocProgramListingType() {
+		m_programlistingBlock = NULL;
+	}
+
+	bool
+	create(
+		DoxyXmlParser* parser,
+		sl::List<DocBlock>* list,
+		const char* name,
+		const char** attributes
+	);
+
+	virtual
+	bool
+	onCharacterData(
+		const char* string,
+		size_t length
+	) {
+		m_programlistingBlock->m_text.append(string, length);
+		return true;
+	}
+};
+
+
 //..............................................................................
 
 class DocHeadingType: public DoxyXmlType {
