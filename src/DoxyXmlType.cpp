@@ -312,6 +312,8 @@ CompoundDefType::onStartElement(
 	case ElemKind_InheritanceGraph:
 	case ElemKind_CollaborationGraph:
 	case ElemKind_ProgramListing:
+		m_parser->pushType<DocProgramListingType>(&m_compound->m_detailedDescription, name, attributes);
+		break;
 	case ElemKind_ListOfAllMembers:
 		break;
 	}
