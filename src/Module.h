@@ -130,6 +130,14 @@ struct DocUlinkBlock: DocBlock {
 	luaExport(lua::LuaState* luaState);
 };
 
+struct DocProgramListingBlock: DocBlock {
+	sl::String m_filename;
+
+	virtual
+	void
+	luaExport(lua::LuaState* luaState);
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct DocHeadingBlock: DocBlock {
