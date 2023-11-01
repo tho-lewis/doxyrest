@@ -602,6 +602,7 @@ Compound::luaExport(lua::LuaState* luaState) {
 	luaState->setMemberString("id", m_id);
 	luaState->setMemberString("name", m_name);
 	luaState->setMemberString("title", m_title);
+	luaState->setMemberString("protectionKind", getProtectionKindString(m_protectionKind));
 
 	if (!m_importId.isEmpty())
 		luaState->setMemberString("importId", m_importId);
