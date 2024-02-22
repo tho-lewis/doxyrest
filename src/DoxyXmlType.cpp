@@ -1113,31 +1113,32 @@ DocParaType::create(
 	m_paragraphBlock = new DocBlock;
 	m_paragraphBlock->m_blockKind = name;
 	
-	if(strcmp(name, "entry") == 0)
+	while (*attributes) 
 	{
-		while (*attributes) {
-			
+		if(strcmp(name, "entry") == 0)
+		{
 			if(strcmp(attributes[0], "class") == 0)
 			{
 				m_paragraphBlock->m_blockClass = attributes[1];
-				//break;
 			}
 			else if(strcmp(attributes[0], "thead") == 0)
 			{
 				m_paragraphBlock->m_thead = attributes[1];
-				//break;
 			}
-			else if(strcmp(attributes[0], "kind") == 0)
+		}
+		else if(strcmp(name, "parameterlist") == 0) 
+		{
+			if(strcmp(attributes[0], "kind") == 0)
 			{
 				if(strcmp(attributes[1], "param") == 0 || strcmp(attributes[1], "retval") == 0) 
 				{
 					m_paragraphBlock->m_blockClass = attributes[1];
-				}
-				
+				}	
 			}
-			attributes += 2;
 		}
+		attributes += 2;
 	}
+	
 	
 	
 	blockList->insertTail(m_paragraphBlock);
