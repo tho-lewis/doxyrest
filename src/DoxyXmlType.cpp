@@ -1127,6 +1127,14 @@ DocParaType::create(
 				m_paragraphBlock->m_thead = attributes[1];
 				//break;
 			}
+			else if(strcmp(attributes[0], "kind") == 0)
+			{
+				if(strcmp(attributes[1], "param") == 0 || strcmp(attributes[1], "retval") == 0) 
+				{
+					m_paragraphBlock->m_blockClass = attributes[1];
+				}
+				
+			}
 			attributes += 2;
 		}
 	}
